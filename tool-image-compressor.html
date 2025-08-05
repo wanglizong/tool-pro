@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Free Image Compressor - Optimize JPG, PNG, WEBP in Bulk | ITTool</title>
+    <meta name="description" content="Compress and optimize your JPG, PNG, and WEBP images in bulk with our powerful online tool. Choose your output format and quality to drastically reduce file sizes without losing quality.">
+    <meta name="keywords" content="image compressor, bulk image compressor, compress image, reduce image size, optimize images, jpg compressor, png compressor, webp converter, free tool">
+    
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <!-- JSZip for downloading all files as a zip -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VVGNY8FVJE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-VVGNY8FVJE');
+  </script>
+    <style>
+        /* Base and Reusable Styles from tool-color-picker.html */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; font-size: 16px; }
+        body { font-family: 'Roboto', sans-serif; background-color: #0F0F1A; color: #E0E0E0; line-height: 1.6; overflow-x: hidden; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Orbitron', sans-serif; color: #FFF; margin-bottom: 0.75em; }
+        a { color: #00f7ff; text-decoration: none; transition: color 0.3s ease; }
+        a:hover { color: #ff00c3; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        :root { --neon-blue: #00f7ff; --neon-pink: #ff00c3; --neon-purple: #9d00ff; --neon-green: #00ff84; --dark-bg: #0F0F1A; --card-bg: #1A1A2E; }
+        .neon-text { text-shadow: 0 0 5px var(--neon-blue), 0 0 10px var(--neon-blue), 0 0 15px var(--neon-blue), 0 0 20px var(--neon-pink); }
+        .btn { display: inline-block; padding: 10px 24px; border-radius: 50px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease; cursor: pointer; border: 2px solid transparent; font-size: 0.85rem; }
+        .btn:disabled { cursor: not-allowed; background-color: #555 !important; box-shadow: none !important; color: #999 !important; border-color: #555 !important; transform: none !important; }
+        .btn-neon { background-color: var(--neon-blue); color: var(--dark-bg); box-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue); }
+        .btn-neon:hover:not(:disabled) { background-color: var(--neon-pink); color: #fff; box-shadow: 0 0 15px var(--neon-pink), 0 0 30px var(--neon-pink), 0 0 5px #fff inset; transform: translateY(-3px); }
+        .btn-outline-neon { background-color: transparent; color: var(--neon-blue); border-color: var(--neon-blue); box-shadow: 0 0 8px var(--neon-blue) inset; }
+        .btn-outline-neon:hover:not(:disabled) { background-color: var(--neon-blue); color: var(--dark-bg); box-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue); transform: translateY(-3px); }
+        .btn-pink-hover:hover:not(:disabled) { color: #fff; border-color: var(--neon-pink); background-color: var(--neon-pink); box-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink); transform: translateY(-3px); }
+
+        /* Header & Footer from tool-color-picker.html */
+        header { background-color: rgba(15, 15, 26, 0.90); backdrop-filter: blur(10px); padding: 15px 0; position: sticky; top: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 15px rgba(0, 247, 255, 0.1); }
+        header .container, .tool-page-footer .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        .logo { font-size: 1.6rem; font-weight: bold; display: flex; align-items: center; }
+        .logo i { margin-right: 10px; font-size: 1.5em; color: var(--neon-blue); }
+        .logo span span.neon-pink { text-shadow: 0 0 5px var(--neon-pink), 0 0 10px var(--neon-pink); }
+        .tool-nav-icons { display: flex; align-items: center; gap: 25px; }
+        .tool-nav-icons a { color: #A0A0A0; font-size: 1.3rem; transition: all 0.3s ease; }
+        .tool-nav-icons a:hover, .tool-nav-icons a.active { color: var(--neon-blue); text-shadow: 0 0 8px var(--neon-blue); transform: translateY(-2px); }
+        .tool-page-footer { background-color: #0A0A12; padding: 30px 0; margin-top: 50px; border-top: 2px solid var(--neon-purple); }
+        .footer-left { display: flex; align-items: center; gap: 25px; }
+        .social-icons a { color: #A0A0A0; font-size: 1.5rem; margin-left: 18px; }
+        .copyright { width: 100%; text-align: center; padding-top: 25px; margin-top: 20px; border-top: 1px solid rgba(157, 0, 255, 0.2); font-size: 0.8rem; color: #888; }
+        
+        /* --- Tool Page Specific Styles --- */
+        .tool-header { padding: 30px 0; text-align: center; }
+        .tool-header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .tool-interface-container { background-color: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--neon-purple); box-shadow: 0 0 25px rgba(157, 0, 255, 0.2); }
+        #file-input { display: none; }
+        
+        /* Drag and Drop Zone */
+        #drop-zone { border: 3px dashed var(--neon-purple); border-radius: 12px; padding: 20px; text-align: center; transition: all 0.3s ease; background-color: #0F0F1A; margin-bottom: 20px; }
+        #drop-zone.dragover { border-color: var(--neon-pink); background-color: #1A1A2E; transform: scale(1.02); }
+        #drop-zone i { font-size: 3rem; color: var(--neon-blue); margin-bottom: 15px; }
+        #drop-zone p { font-size: 1.1rem; }
+        
+        /* Image Queue Styles */
+        #queue-placeholder { width: 100%; text-align: center; color: #888; font-size: 1.1rem; align-self: center; padding: 20px; }
+        #image-queue-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+        .queue-item { position: relative; border: 2px solid var(--neon-blue); border-radius: 8px; background: #0F0F1A; padding: 5px; cursor: pointer; transition: all 0.3s ease; overflow: hidden; text-align: center; }
+        .queue-item:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0, 247, 255, 0.3); }
+        .queue-item.active { border-color: var(--neon-pink); box-shadow: 0 0 15px var(--neon-pink), 0 0 5px var(--neon-pink) inset; }
+        .queue-item .thumb-img { width: 100%; height: 80px; object-fit: cover; border-radius: 4px; margin-bottom: 5px; }
+        .queue-item .thumb-info { font-size: 0.7rem; line-height: 1.3; color: #ccc; word-break: break-all; padding: 0 3px; }
+        .queue-item .file-name { font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; font-weight: bold; }
+        .queue-item .size-details { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 4px; }
+        .queue-item .size-details .comp-size { color: var(--neon-green); font-weight: bold; }
+        .queue-item .thumb-reduction { font-weight: bold; color: var(--neon-green); font-size: 0.9rem; background: rgba(0, 255, 132, 0.15); padding: 1px 6px; border-radius: 20px; display: inline-block; margin-top: 3px; }
+        .queue-item .remove-btn { position: absolute; top: -1px; right: -1px; background: var(--neon-pink); color: white; border: none; width: 22px; height: 22px; border-radius: 0 6px 0 11px; cursor: pointer; font-size: 0.9rem; opacity: 0.8; transition: all 0.2s ease; z-index: 5; }
+        .queue-item .remove-btn:hover { opacity: 1; transform: scale(1.1); }
+        
+        /* Main Processing Area */
+        #processing-container { display: grid; grid-template-columns: 1fr; gap: 20px; align-items: start; margin-top: 25px; }
+        .settings-and-preview { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        .image-preview-area { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; align-items: start; }
+        .image-preview-box { background: #0F0F1A; border-radius: 8px; padding: 15px; border: 1px solid rgba(0,247,255,0.2); text-align: center; }
+        .image-preview-box h3 { font-size: 1.1rem; color: var(--neon-blue); margin-bottom: 10px; }
+        .image-preview-box img { max-width: 100%; max-height: 280px; border-radius: 4px; object-fit: contain; min-height: 100px; background: repeating-conic-gradient(#2a2a3e 0% 25%, #222233 0% 50%) 50% / 20px 20px;}
+        .image-preview-box .size-info { font-size: 1rem; font-weight: bold; margin-top: 10px; }
+        .image-preview-box .size-info span { color: var(--neon-green); }
+        
+        /* Controls & Settings */
+        .controls-panel { background: #0F0F1A; border-radius: 8px; padding: 20px; border: 1px solid rgba(157, 0, 255, 0.2); display: flex; flex-direction: column; gap: 20px; }
+        .control-group label { font-size: 1rem; color: #E0E0E0; margin-bottom: 10px; font-weight: bold; display: block; }
+        #quality-value { color: var(--neon-green); font-weight: bold; font-size: 1.1rem; }
+        input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 5px; background: var(--neon-purple); border-radius: 5px; cursor: pointer; outline: none; transition: opacity .2s; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; background: var(--neon-blue); border-radius: 50%; box-shadow: 0 0 10px var(--neon-blue); cursor: pointer; }
+        input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; background: var(--neon-blue); border-radius: 50%; box-shadow: 0 0 10px var(--neon-blue); cursor: pointer; border: none; }
+
+        /* Custom Select for Format */
+        .custom-select-wrapper { position: relative; }
+        select#format-select { appearance: none; -webkit-appearance: none; background-color: var(--card-bg); border: 1px solid var(--neon-blue); color: #fff; padding: 10px; width: 100%; border-radius: 5px; font-size: 1rem; cursor: pointer; }
+        .custom-select-wrapper::after { content: '\f078'; font-family: "Font Awesome 6 Free"; font-weight: 900; color: var(--neon-blue); position: absolute; right: 15px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+
+        .tool-actions { text-align: center; margin-top: 25px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;}
+        #status-message { margin-top: 20px; padding: 10px 15px; border-radius: 5px; text-align: center; font-weight: bold; display: none; }
+        #status-message.success { background-color: rgba(0, 255, 132, 0.1); color: var(--neon-green); border: 1px solid var(--neon-green); }
+        #status-message.error { background-color: rgba(255, 0, 195, 0.1); color: var(--neon-pink); border: 1px solid var(--neon-pink); }
+        #status-message.info { background-color: rgba(0, 119, 255, 0.1); color: #0077ff; border: 1px solid #0077ff; } /* New info style */
+        
+        /* Content Sections */
+        .content-section { max-width: 900px; margin: 50px auto; color: #C0C0C0; }
+        .content-section h2 { font-size: 1.8rem; border-left: 4px solid var(--neon-blue); padding-left: 15px; }
+
+        @media (max-width: 991px) { .settings-and-preview { grid-template-columns: 1fr; } .controls-panel { order: -1; margin-bottom: 20px; } }
+        @media (max-width: 767px) { .tool-nav-icons a:not(:first-child):not(.active) { display: none; } .tool-page-footer .container, .footer-left { flex-direction: column; } .footer-right { margin-top: 10px; } .image-preview-area { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo"><i class="fas fa-cubes-stacked"></i><span>IT<span class="neon-pink">Tool</span></span></a>
+            <div class="tool-nav-icons">
+                <a href="index.html" title="Home"><i class="fas fa-home"></i></a>
+                <a href="index.html#image-tools-section" title="Image Tools" class="active"><i class="fas fa-image"></i></a>
+                <a href="index.html#pdf-tools-section" title="PDF & Document Tools"><i class="fas fa-file-pdf"></i></a>
+                <a href="index.html#calculator-tools-section" title="Calculator Tools"><i class="fas fa-calculator"></i></a>
+                <a href="index.html#text-tools-section" title="Text Tools"><i class="fas fa-font"></i></a>
+                <a href="index.html#developer-tools-section" title="Developer Tools"><i class="fas fa-code"></i></a>
+                <a href="index.html#color-tools-section" title="Color Tools"><i class="fas fa-palette"></i></a>
+                <a href="index.html#seo-tools-section" title="SEO Tools"><i class="fas fa-search-dollar"></i></a>
+                <a href="index.html#utility-tools-section" title="Utility Tools"><i class="fas fa-wrench"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="tool-header">
+            <div class="container">
+                <h1 class="neon-text">Bulk Image Compressor</h1>
+                <p>Optimize JPG, PNG & WEBP images. Choose your format and quality for the perfect balance.</p>
+            </div>
+        </section>
+
+        <div class="container">
+            <div class="tool-interface-container">
+                <input type="file" id="file-input" accept="image/jpeg, image/png, image/webp" multiple>
+                
+                <div id="drop-zone">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p><strong>Drag & Drop</strong> your images here, or</p>
+                    <button id="upload-btn" class="btn btn-neon" style="margin-top: 15px;"><i class="fas fa-folder-open"></i> Select Files</button>
+                    <p style="font-size: 0.8rem; margin-top: 10px;">(Supports JPG, PNG, WEBP)</p>
+                </div>
+
+                <div id="image-queue-container">
+                    <p id="queue-placeholder">Your image queue is empty.</p>
+                </div>
+
+                <div id="processing-container" style="display: none;">
+                    <div class="settings-and-preview">
+                        <div class="image-preview-area">
+                            <div class="image-preview-box">
+                                <h3>Original</h3>
+                                <img id="original-preview" src="" alt="Original Image Preview">
+                                <p class="size-info" id="original-size"></p>
+                            </div>
+                            <div class="image-preview-box">
+                                <h3>Compressed</h3>
+                                <img id="compressed-preview" src="" alt="Compressed Image Preview">
+                                <p class="size-info" id="compressed-size"></p>
+                            </div>
+                        </div>
+
+                        <div class="controls-panel">
+                            <div class="control-group">
+                                <label for="quality-slider">Quality: <span id="quality-value">80%</span></label>
+                                <input type="range" id="quality-slider" min="10" max="100" step="5" value="80">
+                            </div>
+                            <div class="control-group">
+                                <label for="format-select">Output Format</label>
+                                <div class="custom-select-wrapper">
+                                    <select id="format-select">
+                                        <option value="auto">Auto (Best match)</option>
+                                        <option value="image/jpeg">JPG</option>
+                                        <option value="image/png">PNG</option>
+                                        <option value="image/webp">WEBP</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="status-message"></div>
+
+                <div class="tool-actions">
+                    <button id="download-btn" class="btn btn-neon" disabled><i class="fas fa-download"></i> Download Selected</button>
+                    <button id="download-all-btn" class="btn btn-outline-neon" disabled><i class="fas fa-archive"></i> Download All (.zip)</button>
+                    <button id="clear-queue-btn" class="btn btn-outline-neon btn-pink-hover" disabled><i class="fas fa-trash"></i> Clear Queue</button>
+                </div>
+            </div>
+        </div>
+
+        <section class="content-section">
+            <div class="container">
+                <h2>How to Use the Bulk Image Compressor</h2>
+                <ol style="padding-left: 20px; line-height: 1.8;">
+                    <li><strong>Upload Images:</strong> Drag and drop multiple JPG, PNG, or WEBP files, or click the "Select Files" button.</li>
+                    <li><strong>Adjust Settings:</strong> Use the controls on the right to set your desired compression quality and output format (JPG, PNG, WEBP, or Auto). These settings will apply to the active image and any subsequent compressions.</li>
+                    <li><strong>Review Preview:</strong> Click any image in the queue to make it active. The "Original" and "Compressed" previews will update instantly, showing you the file size savings.</li>
+                    <li><strong>Download:</strong> Click "Download Selected" to save the active image, or "Download All" to get a .zip file containing all your optimized images.</li>
+                </ol>
+            </div>
+        </section>
+    </main>
+
+    <footer class="tool-page-footer">
+        <div class="container">
+            <div class="footer-left">
+                <a href="index.html" class="logo"><i class="fas fa-cubes-stacked"></i></a>
+                <a href="index.html" class="btn btn-outline-neon"><i class="fas fa-th-large"></i> Back to All Tools</a>
+            </div>
+            <div class="footer-right">
+                <div class="social-icons">
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="Youtube"><i class="fab fa-youtube"></i></a>
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="copyright"><p>© 2025 IT Tool. All rights reserved.</p></div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const fileInput = document.getElementById('file-input');
+        const dropZone = document.getElementById('drop-zone');
+        const uploadBtn = document.getElementById('upload-btn');
+        const queueContainer = document.getElementById('image-queue-container');
+        const queuePlaceholder = document.getElementById('queue-placeholder');
+        const processingContainer = document.getElementById('processing-container');
+        const originalPreview = document.getElementById('original-preview');
+        const compressedPreview = document.getElementById('compressed-preview');
+        const originalSize = document.getElementById('original-size');
+        const compressedSize = document.getElementById('compressed-size');
+        const qualitySlider = document.getElementById('quality-slider');
+        const qualityValue = document.getElementById('quality-value');
+        const formatSelect = document.getElementById('format-select');
+        const downloadBtn = document.getElementById('download-btn');
+        const downloadAllBtn = document.getElementById('download-all-btn');
+        const clearQueueBtn = document.getElementById('clear-queue-btn');
+        const statusMessage = document.getElementById('status-message');
+
+        let filesQueue = [];
+        let activeFileId = null;
+        let debounceTimer;
+        let statusTimeout;
+        let compressedBlobUrl = null; // Store the compressed blob URL to revoke it later
+
+        // --- Event Listeners ---
+        uploadBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+        
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+
+        const recompressActiveImage = () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                if (activeFileId) compressImage(activeFileId, true);
+            }, 250);
+        };
+
+        qualitySlider.addEventListener('input', () => {
+            qualityValue.textContent = `${qualitySlider.value}%`;
+            recompressActiveImage();
+        });
+        formatSelect.addEventListener('change', recompressActiveImage);
+        
+        downloadBtn.addEventListener('click', downloadSelectedFile);
+        downloadAllBtn.addEventListener('click', downloadAllFiles);
+        clearQueueBtn.addEventListener('click', resetUI);
+        
+        function formatBytes(bytes, decimals = 1) {
+            if (!bytes || bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+
+        async function handleFiles(files) {
+            hideStatus(); // Hide any previous status message
+            const validFiles = Array.from(files).filter(file => ['image/jpeg', 'image/png', 'image/webp'].includes(file.type));
+            if(validFiles.length !== files.length){
+                showStatus('Warning: Some unsupported file types were ignored.', 'error');
+            }
+            if(validFiles.length === 0) return;
+
+            // Use a for...of loop to ensure sequential compression
+            for (const [index, file] of validFiles.entries()) {
+                const fileId = Date.now() + index;
+                const fileObject = {
+                    id: fileId,
+                    originalFile: file,
+                    originalSrc: URL.createObjectURL(file),
+                    imageElement: null,
+                    compressedBlob: null,
+                };
+                filesQueue.push(fileObject);
+                // Pre-compress on upload. This is an async call.
+                await compressImage(fileId, false); 
+            }
+
+            renderQueue();
+            if (!activeFileId && filesQueue.length > 0) {
+                // Set the first uploaded image as active if none is selected
+                setActiveFile(filesQueue[0].id);
+            }
+            updateUiVisibility();
+        }
+
+        function renderQueue() {
+            if (filesQueue.length === 0) {
+                queueContainer.innerHTML = '';
+                queueContainer.appendChild(queuePlaceholder);
+                return;
+            }
+            queuePlaceholder.style.display = 'none';
+
+            // Loop through the queue and update/create list items
+            filesQueue.forEach(fileObj => {
+                let item = queueContainer.querySelector(`.queue-item[data-id="${fileObj.id}"]`);
+                if (!item) {
+                    item = document.createElement('div');
+                    item.className = 'queue-item';
+                    item.dataset.id = fileObj.id;
+                    queueContainer.appendChild(item);
+                    item.addEventListener('click', (e) => {
+                        if (e.target.classList.contains('remove-btn')) return;
+                        setActiveFile(fileObj.id);
+                    });
+                }
+                
+                item.classList.toggle('active', fileObj.id === activeFileId);
+                
+                const reduction = fileObj.compressedBlob 
+                    ? 100 - (fileObj.compressedBlob.size / fileObj.originalFile.size * 100) 
+                    : 0;
+
+                item.innerHTML = `
+                    <button class="remove-btn" title="Remove image">×</button>
+                    <img src="${fileObj.originalSrc}" alt="${fileObj.originalFile.name}" class="thumb-img">
+                    <div class="thumb-info">
+                        <div class="file-name" title="${fileObj.originalFile.name}">${fileObj.originalFile.name}</div>
+                        <div class="size-details">
+                            <span>${formatBytes(fileObj.originalFile.size)}</span>
+                            <span class="comp-size">${fileObj.compressedBlob ? formatBytes(fileObj.compressedBlob.size) : '...'}</span>
+                        </div>
+                        ${fileObj.compressedBlob ? `<div class="thumb-reduction">-${reduction.toFixed(0)}%</div>` : ''}
+                    </div>`;
+                item.querySelector('.remove-btn').addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent the click from activating the item
+                    removeFile(fileObj.id);
+                });
+            });
+        }
+        
+        function removeFile(id) {
+            const index = filesQueue.findIndex(f => f.id === id);
+            if (index > -1) {
+                const fileToRemove = filesQueue[index];
+                // Revoke the original and compressed blob URLs to free up memory
+                URL.revokeObjectURL(fileToRemove.originalSrc);
+                if (fileToRemove.compressedBlob) {
+                    // Only revoke if the removed file's compressed blob was the one currently in preview
+                    if (activeFileId === id && compressedBlobUrl) {
+                        URL.revokeObjectURL(compressedBlobUrl); 
+                        compressedBlobUrl = null;
+                    }
+                }
+                
+                filesQueue.splice(index, 1);
+                
+                const itemElement = queueContainer.querySelector(`.queue-item[data-id="${id}"]`);
+                if (itemElement) itemElement.remove();
+
+                if (activeFileId === id) {
+                    activeFileId = null;
+                    if (filesQueue.length > 0) {
+                        setActiveFile(filesQueue[0].id);
+                    } else {
+                        // If the queue is now empty, reset the entire UI
+                        resetUI();
+                    }
+                }
+                updateUiVisibility();
+            }
+        }
+
+        async function setActiveFile(id) {
+            // Do nothing if the same file is already active
+            if (activeFileId === id) return;
+            
+            // Clean up old compressed blob URL before setting a new active file
+            if (compressedBlobUrl) {
+                URL.revokeObjectURL(compressedBlobUrl);
+                compressedBlobUrl = null;
+            }
+            
+            activeFileId = id;
+            const fileObj = filesQueue.find(f => f.id === id);
+            
+            // If the file is not found, hide the processing area
+            if (!fileObj) {
+                processingContainer.style.display = 'none';
+                return;
+            }
+            
+            processingContainer.style.display = 'block';
+            originalPreview.src = fileObj.originalSrc;
+            originalSize.innerHTML = `Size: <span>${formatBytes(fileObj.originalFile.size)}</span>`;
+
+            // If a compressed blob already exists for this file, display it
+            if (fileObj.compressedBlob) {
+                const newCompressedSrc = URL.createObjectURL(fileObj.compressedBlob);
+                compressedPreview.src = newCompressedSrc;
+                compressedBlobUrl = newCompressedSrc;
+                const reduction = 100 - (fileObj.compressedBlob.size / fileObj.originalFile.size) * 100;
+                compressedSize.innerHTML = `Size: <span>${formatBytes(fileObj.compressedBlob.size)}</span> (${reduction.toFixed(0)}% smaller)`;
+            } else {
+                // If not, trigger a fresh compression
+                compressedPreview.src = "";
+                compressedSize.innerHTML = `Size: <span>Compressing...</span>`;
+                await compressImage(fileObj.id, true);
+            }
+
+            renderQueue();
+            updateUiVisibility();
+        }
+
+        async function compressImage(id, isManualUpdate) {
+            const fileObj = filesQueue.find(f => f.id === id);
+            if (!fileObj) return;
+
+            // Load image into an Image element if not already done
+            if (!fileObj.imageElement) {
+                fileObj.imageElement = new Image();
+                fileObj.imageElement.src = fileObj.originalSrc;
+                await new Promise(resolve => {
+                    fileObj.imageElement.onload = resolve;
+                    fileObj.imageElement.onerror = () => {
+                        showStatus(`Error loading image: ${fileObj.originalFile.name}`, 'error');
+                        resolve(); // Resolve anyway to not block the loop
+                    };
+                });
+            }
+            
+            await processCanvas(fileObj);
+            
+            // If this is a manual update or the currently active file, update the preview
+            if (isManualUpdate && fileObj.id === activeFileId) {
+                setActiveFile(fileObj.id);
+            }
+            // Always update the thumbnail in the queue
+            renderQueue();
+        }
+        
+        function processCanvas(fileObj){
+            return new Promise(resolve => {
+                const quality = parseInt(qualitySlider.value) / 100;
+                let mimeType = formatSelect.value;
+                
+                // Determine the actual output MIME type
+                if (mimeType === 'auto') {
+                    // If original is PNG and quality is less than 100%,
+                    // convert to WEBP for effective compression.
+                    if (fileObj.originalFile.type === 'image/png' && quality < 1) {
+                        mimeType = 'image/webp'; // WEBP offers good quality and compression
+                    } else {
+                        // Otherwise, stick to the original type or default to JPEG if unknown
+                        mimeType = fileObj.originalFile.type;
+                        if (!['image/jpeg', 'image/png', 'image/webp'].includes(mimeType)) {
+                             mimeType = 'image/jpeg';
+                        }
+                    }
+                }
+
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = fileObj.imageElement.width;
+                canvas.height = fileObj.imageElement.height;
+                
+                // Fill background with white for formats that don't support transparency (e.g., PNG to JPEG)
+                if (mimeType === 'image/jpeg' && fileObj.originalFile.type === 'image/png') {
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                }
+                
+                ctx.drawImage(fileObj.imageElement, 0, 0);
+
+                canvas.toBlob(blob => {
+                    if (blob) {
+                        fileObj.compressedBlob = blob;
+                        // For PNGs, if output format is still PNG, remind user about lossless nature
+                        if (fileObj.originalFile.type === 'image/png' && mimeType === 'image/png' && quality < 1) {
+                            showStatus('PNG is a lossless format; quality slider has minimal effect. Consider JPG/WEBP for more compression.', 'info', 5000);
+                        }
+                    } else {
+                        showStatus(`Error compressing ${fileObj.originalFile.name}.`, 'error');
+                    }
+                    resolve();
+                }, mimeType, quality);
+            });
+        }
+
+        function downloadSelectedFile() {
+            const fileObj = filesQueue.find(f => f.id === activeFileId);
+            if (!fileObj || !fileObj.compressedBlob) {
+                showStatus('Error: No compressed image to download.', 'error');
+                return;
+            }
+            downloadBlob(fileObj.compressedBlob, fileObj.originalFile.name, fileObj.compressedBlob.type);
+        }
+
+        async function downloadAllFiles() {
+            const zip = new JSZip();
+            const compressedFiles = filesQueue.filter(f => f.compressedBlob);
+
+            if (compressedFiles.length === 0) {
+                showStatus('No files have been compressed yet.', 'error');
+                return;
+            }
+            showStatus(`Zipping ${compressedFiles.length} files...`, 'success');
+
+            compressedFiles.forEach(fileObj => {
+                const filename = getCompressedFilename(fileObj.originalFile.name, fileObj.compressedBlob.type);
+                zip.file(filename, fileObj.compressedBlob);
+            });
+            
+            const content = await zip.generateAsync({ type: "blob" });
+            downloadBlob(content, "ToolCraftPro-Compressed-Images.zip");
+            showStatus(`Successfully downloaded all files as a zip archive.`, 'success', 3000);
+        }
+        
+        function downloadBlob(blob, name, type) {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = type ? getCompressedFilename(name, type) : name;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        }
+        
+        function getCompressedFilename(originalName, mimeType) {
+            const name = originalName.substring(0, originalName.lastIndexOf('.'));
+            const ext = mimeType.split('/')[1];
+            return `${name}-compressed.${ext}`;
+        }
+
+        function resetUI() {
+            // Revoke all original file URLs
+            filesQueue.forEach(fileObj => URL.revokeObjectURL(fileObj.originalSrc));
+            // Revoke the compressed preview URL
+            if (compressedBlobUrl) {
+                URL.revokeObjectURL(compressedBlobUrl);
+                compressedBlobUrl = null;
+            }
+            
+            filesQueue = [];
+            activeFileId = null;
+            fileInput.value = '';
+            queueContainer.innerHTML = ''; // Clear queue thumbnails
+            queueContainer.appendChild(queuePlaceholder); // Restore placeholder
+            updateUiVisibility();
+            hideStatus();
+        }
+        
+        function updateUiVisibility() {
+            const hasFiles = filesQueue.length > 0;
+            const hasActiveFile = activeFileId !== null;
+            
+            queuePlaceholder.style.display = hasFiles ? 'none' : 'block';
+            processingContainer.style.display = hasActiveFile ? 'block' : 'none';
+            downloadBtn.disabled = !hasActiveFile;
+            downloadAllBtn.disabled = !hasFiles;
+            clearQueueBtn.disabled = !hasFiles;
+        }
+
+        function showStatus(message, type, duration = 2000) {
+            clearTimeout(statusTimeout);
+            statusMessage.textContent = message;
+            statusMessage.className = ``;
+            statusMessage.classList.add(type);
+            statusMessage.style.display = 'block';
+            statusTimeout = setTimeout(hideStatus, duration);
+        }
+
+        function hideStatus() {
+            statusMessage.style.display = 'none';
+        }
+    });
+    </script>
+</body>
+</html>
